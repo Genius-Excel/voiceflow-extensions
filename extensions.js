@@ -619,3 +619,18 @@ export const FeedbackExtension = {
     element.appendChild(feedbackContainer)
   },
 }
+
+
+export const SaveAttendeeCodeExtension = {
+  name: 'SaveAttendeeCode',
+  type: 'effect',
+  match: ({ trace }) => 
+    trace.type === 'SaveAttendeeCode' || trace.payload?.name === 'SaveAttendeeCode',
+  effect: ({ trace }) => {
+    const attendeeCode = trace.payload?.attendeeCode;
+    if (attendeeCode) {
+      localStorage.setItem('attendeeCode', attendeeCode);
+      console.log(`Attendee code ${attendeeCode} saved to local storage.`);
+    }
+  }
+};
