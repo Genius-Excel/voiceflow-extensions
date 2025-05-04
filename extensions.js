@@ -628,9 +628,22 @@ export const SaveAttendeeCodeExtension = {
     trace.type === 'SaveAttendeeCode' || trace.payload?.name === 'SaveAttendeeCode',
   effect: ({ trace }) => {
     const attendeeCode = trace.payload?.attendeeCode;
-    if (attendeeCode) {
+
+    if (!attendeeCode) return;
+
+    try {
+      // Try saving normally
       localStorage.setItem('attendeeCode', attendeeCode);
-      console.log(`Attendee code ${attendeeCode} saved to local storage.`);
+      console.log(`✅ Attendee code "${attendeeCode}" saved in localStorage.`);
+    } catch (e1) {
+      try {
+        // Try saving via parent if localStorage is blocked in iframe
+        window.parent?.localStorage?.setItem('attendeeCode', attendeeCode);
+        console.log(`✅ Attendee code "${attendeeCode}" saved in parent localStorage.`);
+      } catch (e2) {
+        console.warn("⚠️ Unable to save attendee code to localStorage:", e2.message);
+      }
     }
   }
 };
+
